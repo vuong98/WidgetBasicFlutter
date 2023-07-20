@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:widgetscomponent/constants/constants.dart';
 import 'package:widgetscomponent/utils/text_style.dart';
@@ -20,8 +22,7 @@ class Swiper extends StatefulWidget {
       this.alignment,
       this.radiusItemIndicator,
       this.viewportFraction,
-      this.alignmentItem,
-      this.mode,
+      this.modeAnimation,
       required this.child});
   final EdgeInsets? marginIndicatorBottom;
   final EdgeInsets? paddingItemindicator;
@@ -31,18 +32,17 @@ class Swiper extends StatefulWidget {
   final double? radiusItemIndicator;
   final double? viewportFraction;
 
-  final ModeAnimation? mode;
+  final Curve? modeAnimation;
 
   final CrossAxisAlignment? alignmentCrossView;
   final MainAxisAlignment? alignmentMainView;
   final Alignment? alignment;
-  final Alignment? alignmentItem;
   final Axis? axis;
   // Widget? Function(BuildContext, int) itemBuilder;
 
   final Color? colorSelectedIndicator;
   final Color? colorUnselectedIndicator;
-  final Widget? Function(BuildContext, int)? child;
+  final Widget? Function(BuildContext, int) child;
 
   @override
   State<Swiper> createState() => _SwiperState();
@@ -50,6 +50,8 @@ class Swiper extends StatefulWidget {
 
 class _SwiperState extends State<Swiper> {
   PageController? _pageController;
+  Timer? _timer;
+
   int currentPage = 0;
   @override
   void initState() {
@@ -57,12 +59,26 @@ class _SwiperState extends State<Swiper> {
     super.initState();
     _pageController =
         PageController(viewportFraction: widget.viewportFraction ?? 1);
+
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      print(
+          'timer = ${timer} - currentPage = $currentPage - ${widget.itemCount!}');
+      if (currentPage >= widget.itemCount! - 1) {
+        currentPage = 0;
+        _pageController?.jumpToPage(currentPage);
+      } else {
+        _pageController?.nextPage(
+            duration: const Duration(seconds: 1),
+            curve: widget.modeAnimation ?? Curves.linear);
+      }
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
     _pageController?.dispose();
+    _timer?.cancel();
   }
 
   @override
@@ -88,34 +104,12 @@ class _SwiperState extends State<Swiper> {
                   });
                 },
                 itemCount: widget.itemCount,
-                itemBuilder: (context, index) {
-                  switch (widget.mode) {
-                    case ModeAnimation.TweenAnimation:
-                      var _scale = (index == currentPage) ? 1.0 : 0.7;
-                      return TweenAnimationBuilder(
-                        tween: Tween(begin: _scale, end: _scale),
-                        duration: const Duration(milliseconds: 350),
-                        child: widget.child?.call(context, index),
-                        builder: (context, value, child) {
-                          return Transform.scale(
-                            scale: value,
-                            child: child,
-                          );
-                        },
-                      );
-                    case ModeAnimation.FadeInAnimation:
-                      return widget.child?.call(context, index);
-                    default:
-                      break;
-                  }
-                },
+                itemBuilder: widget.child,
               ),
             ),
             Container(
                 margin: widget.marginIndicatorBottom ??
                     const EdgeInsets.only(bottom: 10),
-                padding: widget.paddingItemindicator ??
-                    const EdgeInsets.symmetric(horizontal: 20),
                 height: widget.heightIndicator,
                 width: double.infinity,
                 child: IndicatorWidget(
@@ -124,6 +118,7 @@ class _SwiperState extends State<Swiper> {
                     itemCount: widget.itemCount,
                     axis: widget.axis,
                     currentPage: currentPage,
+                    paddingItem: widget.paddingItemindicator,
                     height: widget.heightIndicator,
                     width: widget.widthIndicator,
                     colorSelected:

@@ -27,8 +27,6 @@ class IndicatorWidget extends StatelessWidget {
 
   Widget _buidItemIndicator(double? height, double? width, Color? color,
       BorderRadiusGeometry borderRadius) {
-    print('build again _buidItemIndicator');
-
     return Container(
       height: height ?? 15,
       width: width ?? 15,

@@ -13,13 +13,13 @@ class SwiperScreen extends StatelessWidget {
     return Swiper(
       radiusItemIndicator: 10,
       widthIndicator: 10,
-      alignmentItem: Alignment.bottomCenter,
-      alignment: Alignment.centerRight,
+      paddingItemindicator: const EdgeInsets.symmetric(horizontal: 5),
+      alignment: Alignment.bottomCenter,
       heightIndicator: 10,
       colorSelectedIndicator: Colors.red,
       colorUnselectedIndicator: Colors.amberAccent[60],
       itemCount: 4,
-      mode: ModeAnimation.FadeInAnimation,
+      modeAnimation: Curves.linear,
       child: (context, index) {
         return ItemSliderWidget(
             alignmentItem: MainAxisAlignment.start,
