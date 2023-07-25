@@ -60,17 +60,8 @@ class _SwiperState extends State<Swiper> {
     _pageController =
         PageController(viewportFraction: widget.viewportFraction ?? 1);
 
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      print(
-          'timer = ${timer} - currentPage = $currentPage - ${widget.itemCount!}');
-      if (currentPage >= widget.itemCount! - 1) {
-        currentPage = 0;
-        _pageController?.jumpToPage(currentPage);
-      } else {
-        _pageController?.nextPage(
-            duration: const Duration(seconds: 1),
-            curve: widget.modeAnimation ?? Curves.linear);
-      }
+    _pageController?.addListener(() {
+      print('scroll');
     });
   }
 
@@ -98,12 +89,16 @@ class _SwiperState extends State<Swiper> {
               flex: 7,
               child: PageView.builder(
                 controller: _pageController,
+                allowImplicitScrolling: false,
                 onPageChanged: (value) {
+                  print(value);
                   setState(() {
-                    currentPage = value;
+                    currentPage = value % widget.itemCount!;
+                    _pageController?.jumpToPage(
+                      currentPage,
+                    );
                   });
                 },
-                itemCount: widget.itemCount,
                 itemBuilder: widget.child,
               ),
             ),
@@ -117,7 +112,7 @@ class _SwiperState extends State<Swiper> {
                     alignment: widget.alignment,
                     itemCount: widget.itemCount,
                     axis: widget.axis,
-                    currentPage: currentPage,
+                    currentPage: (currentPage % widget.itemCount!),
                     paddingItem: widget.paddingItemindicator,
                     height: widget.heightIndicator,
                     width: widget.widthIndicator,

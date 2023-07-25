@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:widgetscomponent/ui/list_switch.dart';
 import 'package:widgetscomponent/ui/swiper_screen.dart';
-import 'package:widgetscomponent/widgets/animation_basic.dart';
 import 'package:widgetscomponent/widgets/button_widget.dart';
 import 'package:widgetscomponent/widgets/custom_fab_widget.dart';
-import 'package:widgetscomponent/widgets/custom_floating_widget.dart';
-import 'package:widgetscomponent/widgets/floating_widget.dart';
 
 // ignore: must_be_immutable
 class TestComponent extends StatefulWidget {
@@ -19,6 +16,7 @@ class _TestComponentState extends State<TestComponent>
     with TickerProviderStateMixin {
   Offset offset = const Offset(20, 20);
   final GlobalKey _parentKey = GlobalKey();
+  final GlobalKey _parentContainer = GlobalKey();
   // AnimationController? controller;
 
   @override
@@ -27,7 +25,13 @@ class _TestComponentState extends State<TestComponent>
 
     // controller =
     //     AnimationController(duration: const Duration(seconds: 2), vsync: this);
-    // super.initState();
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      RenderBox? box =
+          _parentContainer.currentContext?.findRenderObject() as RenderBox?;
+      Offset? position =
+          box?.localToGlobal(Offset.zero); //this is global position
+    });
   }
 
   @override
@@ -51,6 +55,7 @@ class _TestComponentState extends State<TestComponent>
         ),
         body: Stack(children: [
           Container(
+            key: _parentContainer,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: Column(children: [
               SizedBox(
@@ -83,43 +88,65 @@ class _TestComponentState extends State<TestComponent>
               )
             ]),
           ),
-
-          CustomFABWidget(parentKey: _parentKey,
+          CustomFABWidget(
+            parentKey: _parentKey,
+            parentPreviousViewKey: _parentContainer,
             distance: 50,
             sizeMainFAB: 50,
             offsetDistance: 1.5,
             initOffset: Offset(MediaQuery.of(context).size.width - 50,
-              MediaQuery.of(context).size.height / 2
-            ), children:[
-              Container(
-                alignment: Alignment.center,
-                height: 30,
-                width: 30,
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.amber),
+                MediaQuery.of(context).size.height / 2),
+            children: [
+              GestureDetector(
+                onTap: () {
+                  print(1);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 30,
+                  width: 30,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.amber),
+                ),
               ),
-              Container(
-                alignment: Alignment.center,
-                height: 30,
-                width: 30,
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.green),
+              GestureDetector(
+                onTap: () {
+                  print(2);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 30,
+                  width: 30,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.green),
+                ),
               ),
-              Container(
-                height: 30,
-                width: 30,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.green),
+              GestureDetector(
+                onTap: () {
+                  print(3);
+                },
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.green),
+                ),
               ),
-              Container(
-                height: 30,
-                width: 30,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.green),
+              GestureDetector(
+                onTap: () {
+                  print(4);
+                },
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.green),
+                ),
               ),
-            ],)
+            ],
+          )
         ]));
   }
 }
